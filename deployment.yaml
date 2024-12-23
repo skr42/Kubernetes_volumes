@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: story-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: story
+  template:
+    metadata:
+      labels:
+        app: story
+    spec:
+      containers:
+        - name: story
+          image: sujeet87/kuber_volumes:latest
+          imagePullPolicy: Always
+          env:
+            - name: STORY_FOLDER
+#              value: 'story'   # hardcoded variant
+              valueFrom:
+                configMapKeyRef:
+                  key: folder
+                  name: data-store-env
+          volumeMounts:
+            - mountPath: /app/story
+              name: story-volume
+      volumes:
+        - name: story-volume
+          persistentVolumeClaim:
+            claimName: vol_persistClaim
